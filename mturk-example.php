@@ -1,5 +1,5 @@
 <?php
-require_once('PHP-MTurk-API/MechanicalTurk.class.php');
+require_once('php-mturk-api/MechanicalTurk.class.php');
 
 // Fill out your credentials in config.php.
 //$example = new Example;
