@@ -280,22 +280,41 @@ class MechanicalTurk {
 	*							NumberKnownAnswersCorrect | NumberKnownAnswersIncorrect | NumberKnownAnswersEvaluated | PercentKnownAnswersCorrect | 
 	*							NumberPluralityAnswersCorrect | NumberPluralityAnswersIncorrect | NumberPluralityAnswersEvaluated | PercentPluralityAnswersCorrect)
 	* @param string $timeperiod (OneDay | SevenDays | ThirtyDays | LifeToDate)
-	* @return string
+	* @param int $count Only when $timeperiod = OneDay. Retrieve multiple datapoints.
+	* @return string (or array(array(datetime -> value)) if count > 1).
 	* @throws AMTException when the server can not be contacted or the request or response isn't in the right format. (bubbles up from getAPIResponse())	
 	* @link http://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_GetRequesterWorkerStatisticOperation.html
 	*/	
-	public function getRequesterWorkerStatistic($worker_id, $statistic = 'PercentAssignmentsApproved', $timeperiod = 'LifeToDate') {
+	public function getRequesterWorkerStatistic($worker_id, $statistic = 'PercentAssignmentsApproved', $timeperiod = 'LifeToDate', $count = 1) {
 		
 		$data = array(	'WorkerId'  	=> $worker_id,
 						'Statistic' 	=> $statistic,
 						'TimePeriod' 	=> $timeperiod );
 		
+		if($count > 1) {
+			if($timeperiod != 'OneDay')
+				throw new AMTException("Count can only be set if the timeperiod is OneDay");
+			else
+				$data['Count'] = $count;
+		}
+		
 		$xml = $this->getAPIResponse('GetRequesterWorkerStatistic', $data);	
 		$statxml = $xml->xpath('GetStatisticResult/DataPoint');
 		$this->log("Retrieved RequesterWorkerStatistic ($statistic) for $worker_id");
 
-		foreach ($statxml[0] as $element=>$value)
-			if ($element != "Date") return (string) $value; // Currently, retrieving multiple datapoints is not implemented. So we don't need Date.
+		if($count > 1)	{
+			$ret = array();
+			foreach ($statxml as $x){
+				foreach ($x as $element=>$value){
+					if ($element == 'Date') $date = (string) $value;
+					else $ret[$date] = (string) $value;
+				}
+			}
+			return $ret;										// return array.
+		} else {				
+			foreach ($statxml[0] as $element=>$value)
+				if ($element != 'Date') return (string) $value; // return just one value
+		}
 		
 		// This should not be reached.
 		throw new AMTException("Invalid response.");
@@ -342,24 +361,44 @@ class MechanicalTurk {
 	* 							AverageRewardAmount | TotalRewardFeePayout | TotalBonusPayout | TotalBonusFeePayout | NumberHITsCreated | NumberHITsCompleted | 
 	* 							NumberHITsAssignable | NumberHITsReviewable | EstimatedRewardLiability | EstimatedFeeLiability | EstimatedTotalLiability )
 	* @param string TimePeriod (OneDay | SevenDays | ThirtyDays | LifeToDate)
+	* @param int $count Only when $timeperiod = OneDay. Retrieve multiple datapoints.
+	* @return string (or array(array(datetime -> value)) if count > 1).	
 	* @return string
 	* @throws AMTException when the server can not be contacted or the request or response isn't in the right format. (bubbles up from getAPIResponse())	
 	* @link http://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_GetRequesterStatistic.html
 	*/	
-	public function getRequesterStatistic($statistic = 'NumberAssignmentsAvailable', $timeperiod = 'LifeToDate') {
+	public function getRequesterStatistic($statistic = 'NumberAssignmentsAvailable', $timeperiod = 'LifeToDate', $count = 1) {
 		
 		$data = array(	'Statistic' 	=> $statistic,
 						'TimePeriod' 	=> $timeperiod );
 		
-			$xml = $this->getAPIResponse('GetRequesterStatistic', $data);	
-			$statxml = $xml->xpath('GetStatisticResult/DataPoint');
-			$this->log("Retrieved $statistic.");
-
+		if($count > 1) {
+			if($timeperiod != 'OneDay')
+				throw new AMTException("Count can only be set if the timeperiod is OneDay");
+			else
+				$data['Count'] = $count;
+		}
+		
+		$xml = $this->getAPIResponse('GetRequesterStatistic', $data);	
+		$statxml = $xml->xpath('GetStatisticResult/DataPoint');
+		$this->log("Retrieved $statistic.");
+	
+		if($count > 1)	{
+			$ret = array();
+			foreach ($statxml as $x){
+				foreach ($x as $element=>$value){
+					if ($element == 'Date') $date = (string) $value;
+					else $ret[$date] = (string) $value;
+				}
+			}
+			return $ret;										// return array.
+		} else {				
 			foreach ($statxml[0] as $element=>$value)
-				if ($element != "Date") return (string) $value; // Currently, retrieving multiple datapoints is not implemented, so we don't need Date.
-			
-			// This should not be reached.
-			throw new AMTException("Invalid response.");
+				if ($element != 'Date') return (string) $value; // return just one value
+		}
+
+		// This should not be reached.
+		throw new AMTException("Invalid response.");
 
 	}
 	
