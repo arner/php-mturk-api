@@ -1,9 +1,9 @@
 <?php
-require_once('php-mturk-api/MechanicalTurk.class.php');
+require_once(dirname(__FILE__) . '/php-mturk-api/MechanicalTurk.class.php');
 
 // Fill out your credentials in config.php.
-//$example = new Example;
-//$example->createHit();
+// $example = new Example;
+// $example->notifyWorkers();
 
  
 class Example {
@@ -13,7 +13,10 @@ class Example {
 	public function __construct(){
 		$this->mturk = new MechanicalTurk();
 	}
-
+	
+	public function notifyWorkers(){
+		$this->mturk->notifyWorkers('test message', 'body of the message', 'A1M46IEXAMPLE'); 
+	}
 	
 	public function setNotificationOfTheFirstHITTypeToInactive(){
 		// Not a very useful function, but it demonstrates how to get all the HITs as well as the Notification operation.

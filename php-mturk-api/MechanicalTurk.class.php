@@ -378,6 +378,34 @@ class MechanicalTurk {
 	
 	
 	/**
+	* Send an e-mail message to a maximum of 100 workers.
+	* @param string $subject
+	* @param string $body
+	* @param string[] or string $worker_id
+	* @throws AMTException when the server can not be contacted or the request or response isn't in the right format. (bubbles up from getAPIResponse())
+	* @link http://docs.aws.amazon.com/AWSMechTurk/latest/AWSMturkAPI/ApiReference_BlockWorkerOperation.html
+	*/	
+	public function notifyWorkers($subject, $messageText, $worker_id) {
+		$data = array(	'Subject' => $subject,
+						'MessageText' => $messageText,
+		);
+
+		$count = 1;
+		if(is_array($worker_id)){
+			foreach($worker_id as $wid){
+				$data["WorkerId.$count"] = $wid;
+				$count++;
+			}
+		} else {
+			$data["WorkerId"] = $worker_id;
+		}
+		
+		$xml = $this->getAPIResponse('NotifyWorkers', $data);
+		$this->log("Sent message with subject $subject to $count worker(s).");
+	}
+	
+	
+	/**
 	* Get statistics for the Requester.
 	* @param string $statistic ( NumberAssignmentsAvailable | NumberAssignmentsAccepted | NumberAssignmentsPending | NumberAssignmentsApproved | NumberAssignmentsRejected | 
 	* 							NumberAssignmentsReturned | NumberAssignmentsAbandoned	| PercentAssignmentsApproved | PercentAssignmentsRejected | TotalRewardPayout | 
