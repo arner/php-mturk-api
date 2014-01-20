@@ -29,6 +29,7 @@ getRequesterWorkerStatistic<br>
 blockWorker<br>
 unblockWorker<br>
 grantBonus<br>
+notifyWorkers<br>
 <br>
 <b>Requester</b><br>
 getRequesterStatistic<br>
