@@ -67,6 +67,21 @@ class Assignment {
 		return $ret;
 	}
 	
+	public function toArray(){
+		return array(	'AssignmentId' => $this->AssignmentId,
+						'WorkerId' => $this->WorkerId,
+						'HITId' => $this->HITId,
+						'AssignmentStatus' => $this->AssignmentStatus,
+						'AutoApprovalTime' => $this->AutoApprovalTime,
+						'AcceptTime' => $this->AcceptTime,
+						'SubmitTime' => $this->SubmitTime,
+						'ApprovalTime' => $this->ApprovalTime,
+						'RejectionTime'  => $this->RejectionTime,
+						'Deadline' => $this->Deadline,
+						'Answer' => $this->Answer,						
+						'RequesterFeedback' => $this->RequesterFeedback);
+	}
+	
 	public function getAssignmentId(){
 		return $this->AssignmentId;
 	}
