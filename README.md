@@ -47,13 +47,14 @@ Instantiate
 require_once('MechanicalTurk.class.php')
 $mturk = new MechanicalTurk();
 ```
-Retrieve a list of all the id's of your HITs.
+Retrieve all your HITs.
 ```php
 print_r($mturk->getAllHITs());
 ```
-Retrieve a full Hit object.
+Retrieve a Hit object and convert it to an array for easy access.
 ```php
 $hit = $mturk->getHIT('THE_HIT_ID');
-print_r($hit);
+$array = $hit->toArray();
+print_r($array);
 ```
 Please refer to mturk-example.php for info on HIT creation.
