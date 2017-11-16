@@ -9,7 +9,7 @@
 * @license IPL
 */
 
-require_once(dirname(__FILE__) . '/config.php');
+include_once(dirname(__FILE__) . '/config.php');
 require_once(dirname(__FILE__) . '/Hit.class.php');
 require_once(dirname(__FILE__) . '/Assignment.class.php');
 require_once(dirname(__FILE__) . '/AMTException.class.php');
@@ -552,12 +552,14 @@ class MechanicalTurk {
 	* @throws AMTException when the AMT server cannot be contacted or the request isn't valid.
 	* @throws UnexpectedValueException when AMT's response is not XML.
 	*/	
-	private function getAPIResponse($operation, $data = array(), $responsegroup = null){
+	public function getAPIResponse($operation, $data = array(), $responsegroup = null){
 		// Add the common parameters
+		$time = new DateTime();
+		$iso8601 = $time->format(DateTime::ATOM);
 		$data['Operation']		= $operation;	
 		$data['AWSAccessKeyId']	= AWS_ACCESS_KEY;
-		$data['Signature'] 		= $this->generateSignature("AWSMechanicalTurkRequester", $operation, time(), false);
-		$data['Timestamp']		= time();
+		$data['Signature'] 		= $this->generateSignature("AWSMechanicalTurkRequester", $operation, $iso8601, false);
+		$data['Timestamp']		= $iso8601;
 		
 		if(isset($responsegroup)) $data['ResponseGroup'] = $responsegroup; 
 		 
